@@ -1,0 +1,63 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  min-width: 600px;
+  max-width: 600px;
+  margin: 0 auto 80px auto;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+
+  text-align: left;
+}
+
+.input-bar {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  justify-content: center;
+  display: flex;
+}
+
+.input-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+}
+
+/* Media query para telas pequenas (mobile) */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  body {
+    padding: 0 1rem;
+  }
+}
