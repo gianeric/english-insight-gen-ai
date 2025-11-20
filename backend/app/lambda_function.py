@@ -5,6 +5,27 @@ from utils.mappers.event_mapper import EventMapper
 from services.corrector_service import CorrectorService
 from google import genai
 
+def parse_clean_gemini_response(raw):
+    try:
+        if isinstance(raw, (dict, list)):
+            text = json.dumps(raw, ensure_ascii=False)
+        else:
+            text = str(raw)
+            try:
+                parsed = json.loads(text)
+                text = json.dumps(parsed, ensure_ascii=False)
+            except Exception:
+                try:
+                    text = bytes(text, "utf-8").decode("unicode_escape")
+                except Exception:
+                    pass
+
+        text = text.replace('\\n', ' ').replace('\n', ' ').strip()
+        text = text.replace("\\'", "'").replace('\\"', '"')
+        return text
+    except Exception:
+        return str(raw)
+
 class LambdaEnglishCorrector:
     def __init__(self):
         self.logger = get_logger(None)
@@ -29,17 +50,25 @@ class LambdaEnglishCorrector:
             auth_gemini = AuthGemini()
             client = genai.Client(api_key=auth_gemini.authorization())
 
-            response = client.models.generate_content(
+            gemini_response = client.models.generate_content(
                 model="gemini-2.5-flash",
                 contents=f"{corrector.prompt()}\n\nFrase: {sentence}"
             )
             
+            cleaned = parse_clean_gemini_response(gemini_response.text)
+
             self.logger.info("[LambdaEnglishCorrector] Correção gerada com sucesso.")
-            
-            return {
+
+            response = {
                 "statusCode": 200,
-                "body": json.dumps({"correction": response.text})
+                "body": {
+                    "correction": cleaned
+                }
             }
+
+            self.logger.info(response)
+            
+            return response
         except ConnectionError as ce:
             self.logger.error(f"[LambdaEnglishCorrector] Erro ao conectar no serviço externo: {ce}")
             return {
@@ -59,6 +88,6 @@ lambda_instance = LambdaEnglishCorrector()
 def handler(event, context):    
     return lambda_instance.correct_sentence(event, context)
 
-# if __name__ == "__main__":
-#     setence = {'body': '{\n\t"sentence": "She don\'t like the movie."\n}'}
-#     handler(setence, "context")
+if __name__ == "__main__":
+    setence = {'body': '{\n\t"sentence": "She don\'t like the movie."\n}'}
+    handler(setence, "context")
