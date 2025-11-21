@@ -5,6 +5,14 @@ from utils.mappers.event_mapper import EventMapper
 from services.corrector_service import CorrectorService
 from google import genai
 
+headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Credentials": "true",
+    "Content-Type": "application/json"
+}
+
 def parse_clean_gemini_response(raw):
     try:
         if isinstance(raw, (dict, list)):
@@ -34,6 +42,14 @@ class LambdaEnglishCorrector:
     def correct_sentence(self, event, context):
         self.logger.info("[LambdaEnglishCorrector] Manipulando evento.")
 
+        http_method = event.get("httpMethod", "")
+        if http_method == "OPTIONS":
+            return {
+                "statusCode": 204,
+                "headers": headers,
+                "body": ""
+            }
+
         mapper = EventMapper()
         body = mapper.map_event_to_dto(event)
         sentence = body.get("sentence", "")
@@ -42,6 +58,7 @@ class LambdaEnglishCorrector:
             self.logger.error(f"[LambdaEnglishCorrector] Nenhuma frase fornecida.")
             return {
                 "statusCode": 400,
+                "headers": headers,
                 "body": json.dumps({"error": "Nenhuma frase fornecida."})
             }
         
@@ -58,12 +75,16 @@ class LambdaEnglishCorrector:
             cleaned = parse_clean_gemini_response(gemini_response.text)
 
             self.logger.info("[LambdaEnglishCorrector] Correção gerada com sucesso.")
-
             response = {
                 "statusCode": 200,
-                "body": {
-                    "correction": cleaned
-                }
+                "headers": headers,
+                "body": json.dumps(
+                    {"correction": cleaned},
+                    ensure_ascii=False
+                )
+            }
+            self.logger.info(response)
+            return response
             }
 
             self.logger.info(response)
@@ -73,6 +94,7 @@ class LambdaEnglishCorrector:
             self.logger.error(f"[LambdaEnglishCorrector] Erro ao conectar no serviço externo: {ce}")
             return {
                 "statusCode": 503,
+                "headers": headers,
                 "body": json.dumps({"error": "Erro ao conectar no serviço externo."})
             }
         
@@ -80,6 +102,7 @@ class LambdaEnglishCorrector:
             self.logger.error(f"[LambdaEnglishCorrector] Erro interno ao processar a frase: {e}")
             return {
                 "statusCode": 500,
+                "headers": headers,
                 "body": json.dumps({"error": "Erro interno ao processar a frase."})
             }
 

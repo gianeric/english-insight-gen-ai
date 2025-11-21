@@ -1,8 +1,15 @@
 export async function sendMessageToApi(message) {
+  const url = "http://localhost:3000/corrector";
+
   try {
-    const response = await fetch(
-      "https://pokeapi.co/api/v2/pokemon/?offset=180&limit=20"
-    );
+    const response = await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sentence: message }),
+    });
 
     if (!response.ok) {
       throw new Error(`Erro na requisição: ${response.status}`);
