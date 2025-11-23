@@ -106,7 +106,7 @@ No diretório backend/app, crie o arquivo .env (não commitá-lo):
 GEMINI_API_KEY=SUA_CHAVE_AQUI
 ```
 
-Descomente esse trecho de código em backend\app\lambda_function.py
+O debug começa nesse trecho fixo do código em backend\app\lambda_function.py
 
 ```python
 if __name__ == "__main__":
