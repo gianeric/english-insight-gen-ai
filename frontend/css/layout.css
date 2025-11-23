@@ -102,6 +102,13 @@ main {
   margin: 1rem 0;
 }
 
+.message-response .user-message {
+  margin: 0;
+  color: #c36161;
+  font-size: 1rem;
+  font-style: italic;
+}
+
 .message-response .correction {
   margin: 0;
   color: #e9ecef;

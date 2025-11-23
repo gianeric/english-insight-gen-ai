@@ -21,18 +21,12 @@ button.addEventListener("click", async () => {
   hideSpinner(messages);
   button.disabled = false;
 
-  if (apiResponse && apiResponse.correction) {
+  if (apiResponse) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("message-response", "mb-2");
     msgDiv.innerHTML = `
-      <p class="correction"><strong>Correção:</strong> ${
-        apiResponse.correction
-      }</p>
-      ${
-        apiResponse.explanation
-          ? `<p class="explanation"><em>${apiResponse.explanation}</em></p>`
-          : ""
-      }
+      <p class="user-message"><strong>Você:</strong> ${text}</p>
+      <p class="correction"><strong>Correção:</strong> ${apiResponse}</p>
     `;
     messages.appendChild(msgDiv);
 
