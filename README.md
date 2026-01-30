@@ -64,6 +64,8 @@ sam build
 
 ### 6️⃣ Rodar a Lambda localmente
 
+⚠️ Certifique-se de que o Docker está rodando (conforme etapa 2️⃣):
+
 ```bash
 sam local start-api --env-vars env.json
 ```
